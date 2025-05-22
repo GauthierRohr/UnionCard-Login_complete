@@ -188,7 +188,9 @@ const Header = () => {
               </a>
             </div>
 
-            {!user && (
+            {user ? (
+              <UserMenu />
+            ) : (
               <button
                 onClick={() => {
                   setIsMenuOpen(false);
