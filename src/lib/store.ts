@@ -11,6 +11,7 @@ interface AuthState {
     referral_code: string;
     qualified_referrals: number;
     total_referrals: number;
+    has_card: boolean;
   } | null;
   setUser: (user: User | null) => void;
   setProfile: (profile: AuthState['profile']) => void;
@@ -34,7 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const { data: profile } = await supabase
       .from('users')
-      .select('first_name, last_name, university, referral_code, qualified_referrals')
+      .select('first_name, last_name, university, referral_code, qualified_referrals, has_card')
       .eq('id', user.id)
       .single();
 
