@@ -7,13 +7,16 @@ interface AuthState {
   profile: {
     first_name: string;
     last_name: string;
+    university: string;
     referral_code: string;
     qualified_referrals: number;
+    total_referrals: number;
   } | null;
   setUser: (user: User | null) => void;
   setProfile: (profile: AuthState['profile']) => void;
   signOut: () => Promise<void>;
   loadProfile: () => Promise<void>;
+  updateProfile: (updates: Partial<AuthState['profile']>) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -31,12 +34,37 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const { data: profile } = await supabase
       .from('users')
-      .select('first_name, last_name, referral_code, qualified_referrals')
+      .select('first_name, last_name, university, referral_code, qualified_referrals')
       .eq('id', user.id)
       .single();
 
     if (profile) {
-      set({ profile });
+      const { data: referrals } = await supabase
+        .from('users')
+        .select('id')
+        .eq('referred_by', profile.referral_code);
+
+      set({ 
+        profile: { 
+          ...profile,
+          total_referrals: referrals?.length || 0
+        }
+      });
+    }
+  },
+  updateProfile: async (updates) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', user.id);
+
+    if (!error) {
+      set((state) => ({
+        profile: state.profile ? { ...state.profile, ...updates } : null
+      }));
     }
   },
 }));
