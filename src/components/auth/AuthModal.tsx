@@ -12,9 +12,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [university, setUniversity] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const universities = [
+    { id: 'epfl', name: 'EPFL' },
+    { id: 'unil', name: 'UNIL' },
+    { id: 'hec', name: 'HEC Lausanne' },
+    { id: 'ehl', name: 'EHL' },
+    { id: 'ecal', name: 'ECAL' },
+  ];
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,6 +40,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
         if (error) throw error;
         onClose();
       } else {
+        if (!university) {
+          throw new Error('Veuillez sélectionner votre université');
+        }
+
         const { error: signUpError, data } = await supabase.auth.signUp({
           email,
           password,
@@ -47,6 +60,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                 email,
                 first_name: firstName,
                 last_name: lastName,
+                university,
                 referral_code: `UNION-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
               },
             ]);
@@ -115,6 +129,24 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose }) => {
                   className="w-full p-2 border border-gray-300 rounded-lg"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Université
+                </label>
+                <select
+                  value={university}
+                  onChange={(e) => setUniversity(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-lg"
+                  required
+                >
+                  <option value="">Sélectionner une université</option>
+                  {universities.map((uni) => (
+                    <option key={uni.id} value={uni.id}>
+                      {uni.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
