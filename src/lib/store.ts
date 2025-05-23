@@ -35,7 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     const { data: profile } = await supabase
       .from('users')
-      .select('first_name, last_name, university, referral_code, qualified_referrals, has_card')
+      .select('first_name, last_name, university, referral_code, qualified_referrals, total_referrals, has_card')
       .eq('id', user.id)
       .single();
 
