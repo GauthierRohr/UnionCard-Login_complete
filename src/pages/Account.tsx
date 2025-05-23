@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import Button from '../components/ui/Button';
 
 const Account: React.FC = () => {
-  const { user, profile, loadProfile } = useAuthStore();
+  const { user, profile } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

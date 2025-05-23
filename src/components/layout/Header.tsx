@@ -9,7 +9,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user } = useAuthStore();
+  const { user, profile } = useAuthStore();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,7 +103,7 @@ const Header = () => {
               </a>
             </div>
 
-            {user ? (
+            {user && profile ? (
               <UserMenu />
             ) : (
               <button
@@ -188,7 +188,11 @@ const Header = () => {
               </a>
             </div>
 
-            {!user && (
+            {user && profile ? (
+              <div className="pt-2 text-center">
+                <UserMenu />
+              </div>
+            ) : (
               <button
                 onClick={() => {
                   setIsMenuOpen(false);
