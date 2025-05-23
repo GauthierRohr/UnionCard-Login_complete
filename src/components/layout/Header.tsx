@@ -189,7 +189,7 @@ const Header = () => {
             </div>
 
             {user && profile ? (
-              <div className="pt-2 text-center">
+              <div className="pt-2">
                 <UserMenu />
               </div>
             ) : (
