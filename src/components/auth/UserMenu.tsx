@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../lib/store';
-import { ChevronDown, LogOut, Settings, User } from 'lucide-react';
+import { ChevronDown, LogOut, Settings } from 'lucide-react';
 
 const UserMenu: React.FC = () => {
   const { user, profile, signOut } = useAuthStore();
@@ -44,6 +44,7 @@ const UserMenu: React.FC = () => {
             <Settings className="h-4 w-4 mr-2" />
             Paramètres
           </Link>
+<<<<<<< HEAD
           <Link
             to="/dashboard"
             className="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50"
@@ -52,6 +53,8 @@ const UserMenu: React.FC = () => {
             <User className="h-4 w-4 mr-2" />
             Tableau de bord
           </Link>
+=======
+>>>>>>> 80e86695d7cf05eb0691e5799a5b0cf80a8a8bff
           <button
             onClick={async () => {
               await signOut();
