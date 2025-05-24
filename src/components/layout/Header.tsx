@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import { Menu, X, CreditCard, Instagram, Facebook } from 'lucide-react';
 import AuthModal from '../auth/AuthModal';
 import UserMenu from '../auth/UserMenu';
 import { useAuthStore } from '../../lib/store';
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -102,8 +103,7 @@ const Header = () => {
                 <Facebook className="h-5 w-5" />
               </a>
             </div>
-
-            {user && profile ? (
+            {/* {user ? (
               <UserMenu />
             ) : (
               <button
@@ -112,7 +112,22 @@ const Header = () => {
               >
                 Connexion
               </button>
-            )}
+            )} */}
+            {user ? (
+            <Link
+              to="/account"
+              className="px-5 py-2 bg-white text-blue-600 rounded-lg font-medium transition-all hover:bg-gray-100 hover:shadow-md"
+            >
+              Mon compte
+            </Link>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg font-medium transition-all hover:bg-blue-700 hover:shadow-md"
+            >
+              Connexion
+            </button>
+          )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -187,22 +202,42 @@ const Header = () => {
                 <Facebook className="h-5 w-5" />
               </a>
             </div>
-
-            {user && profile ? (
-              <div className="pt-2 text-center">
-                <UserMenu />
-              </div>
-            ) : (
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  setShowAuthModal(true);
-                }}
-                className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-center"
-              >
-                Connexion
-              </button>
-            )}
+          {/* {user ? (
+            <div className="pt-2 text-center">
+              <UserMenu />
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                setShowAuthModal(true);
+              }}
+              className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-center"
+            >
+              Connexion
+            </button>
+          )} */}
+          {user ? (
+          <div className="pt-2 text-center">
+            <Link
+              to="/account"
+              onClick={() => setIsMenuOpen(false)}
+              className="block px-5 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-center"
+            >
+              Mon compte
+            </Link>
+          </div>
+        ) : (
+          <button
+            onClick={() => {
+              setIsMenuOpen(false);
+              setShowAuthModal(true);
+            }}
+            className="px-5 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-center"
+          >
+            Connexion
+          </button>
+        )}
           </nav>
         </div>
       )}

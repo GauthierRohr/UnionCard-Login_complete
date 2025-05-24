@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
@@ -7,6 +7,7 @@ import Partners from './pages/Partners';
 import WinYourCard from './pages/WinYourCard';
 import Account from './pages/Account';
 import Dashboard from './pages/Dashboard';
+import UserProfile from './components/ui/UserProfile';
 import { useAuthStore } from './lib/store';
 import { supabase } from './lib/supabaseClient';
 
@@ -25,7 +26,7 @@ function App() {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         loadProfile();
@@ -44,6 +45,7 @@ function App() {
           <Route path="/partners" element={<Partners />} />
           <Route path="/win-your-card" element={<WinYourCard />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/profile" element={<UserProfile />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </Layout>
