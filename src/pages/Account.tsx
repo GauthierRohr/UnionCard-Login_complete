@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import Button from '../components/ui/Button';
 
 const Account: React.FC = () => {
-  const { user, profile, loadProfile, updateProfile } = useAuthStore();
+  const { user, profile, loadProfile, updateProfile, signOut } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -26,6 +26,7 @@ const Account: React.FC = () => {
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
+      if (!profile) loadProfile();
     }
     if (profile) {
       setFirstName(profile.first_name);
@@ -82,13 +83,24 @@ const Account: React.FC = () => {
     setIsLoading(false);
   };
 
-  if (!user || !profile) {
+  if (!user) {
     return (
       <Section className="pt-24">
         <div className="text-center">Veuillez vous connecter pour accéder à cette page.</div>
       </Section>
     );
   }
+
+if (!profile) {
+  return (
+    <Section className="pt-24 flex justify-center items-center">
+      <div className="flex flex-col items-center space-y-4">
+        <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-gray-600">Chargement du profil...</p>
+      </div>
+    </Section>
+  );
+}
 
   return (
     <Section className="pt-24">
@@ -252,6 +264,16 @@ const Account: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="text-center mt-12">
+          <Button
+            variant="outline"
+            onClick={() => signOut()}
+            className="text-red-600 border-red-600 hover:bg-red-50"
+          >
+            Déconnexion
+          </Button>
         </div>
       </div>
     </Section>
