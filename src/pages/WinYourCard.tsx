@@ -23,7 +23,7 @@ const WinYourCard: React.FC = () => {
               <>Salut {profile.first_name} !<br></br>
               Ta carte Union t'attend. Prêt à la débloquer ?</>
             ) : (
-              <>Obtiens ta carte Union maintenant - c’est gratuit !</>
+              <>Obtiens gratuitement ta carte Union !</>
             )}
           </SectionTitle>
 
@@ -111,7 +111,7 @@ const WinYourCard: React.FC = () => {
           ) : (
             <div className="text-center mb-8">
               <Button onClick={() => setShowAuthModal(true)} variant="primary" size="lg">
-                Obtiens ta carte gratuite maintenant
+                Obtenir ma carte
               </Button>
             </div>
           )}
