@@ -74,14 +74,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           ...profile,
           total_referrals: referralsCount || 0
         },
-        isLoading: false
+        isLoading: false,
+        error: null
       });
     } catch (error) {
+      console.error('Error loading profile:', error);
       set({
         error: 'Erreur lors du chargement du profil',
-        isLoading: false
+        isLoading: false,
+        profile: null
       });
-      console.error('Error loading profile:', error);
     }
   },
 
@@ -101,14 +103,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       set((state) => ({
         profile: state.profile ? { ...state.profile, ...updates } : null,
-        isLoading: false
+        isLoading: false,
+        error: null
       }));
     } catch (error) {
+      console.error('Error updating profile:', error);
       set({
         error: 'Erreur lors de la mise à jour du profil',
         isLoading: false
       });
-      console.error('Error updating profile:', error);
     }
   },
 
@@ -134,9 +137,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       await get().updateProfile({ avatar_url: publicUrl });
 
-      set({ isLoading: false });
+      set({ isLoading: false, error: null });
       return publicUrl;
     } catch (error) {
+      console.error('Error uploading avatar:', error);
       set({
         error: "Erreur lors de l'upload de l'avatar",
         isLoading: false
@@ -155,16 +159,19 @@ export const initializeAuth = async () => {
     return;
   }
 
-  setUser(session?.user ?? null);
   if (session?.user) {
+    setUser(session.user);
     await loadProfile();
   }
 
-  supabase.auth.onAuthStateChange(async (_, session) => {
-    setUser(session?.user ?? null);
+  supabase.auth.onAuthStateChange(async (event, session) => {
+    const { setUser, loadProfile } = useAuthStore.getState();
+    
     if (session?.user) {
+      setUser(session.user);
       await loadProfile();
     } else {
+      setUser(null);
       useAuthStore.setState({ profile: null });
     }
   });
