@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ScrollToTop from './components/utils/ScrollToTop';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Offers from './pages/Offers';
@@ -38,6 +39,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />

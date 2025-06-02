@@ -44,17 +44,6 @@ const UserMenu: React.FC = () => {
             <Settings className="h-4 w-4 mr-2" />
             Paramètres
           </Link>
-<<<<<<< HEAD
-          <Link
-            to="/dashboard"
-            className="flex items-center px-4 py-2 text-gray-700 hover:bg-blue-50"
-            onClick={() => setIsOpen(false)}
-          >
-            <User className="h-4 w-4 mr-2" />
-            Tableau de bord
-          </Link>
-=======
->>>>>>> 80e86695d7cf05eb0691e5799a5b0cf80a8a8bff
           <button
             onClick={async () => {
               await signOut();
