@@ -10,6 +10,7 @@ interface Profile {
   qualified_referrals: number;
   total_referrals: number;
   has_card: boolean;
+  avatar_url?: string;
 }
 
 interface AuthState {
@@ -24,6 +25,7 @@ interface AuthState {
   signOut: () => Promise<void>;
   loadProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Profile>) => Promise<void>;
+  uploadAvatar: (file: File) => Promise<string>;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -32,13 +34,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   isLoading: false,
   error: null,
 
-  // Setters de base
   setUser: (user) => set({ user }),
   setProfile: (profile) => set({ profile }),
   setIsLoading: (isLoading) => set({ isLoading }),
   setError: (error) => set({ error }),
 
-  // Déconnexion
   signOut: async () => {
     try {
       set({ isLoading: true });
@@ -49,7 +49,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // Chargement du profil
   loadProfile: async () => {
     const { user } = get();
     if (!user) return;
@@ -57,21 +56,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
 
-      console.log("Chargement du profil pour l'utilisateur :", user.id);
-
-      // Récupère le profil de base
       const { data: profile, error: profileError } = await supabase
         .from('users')
-        .select('first_name, last_name, university, referral_code, qualified_referrals, has_card', { head: false })
+        .select('first_name, last_name, university, referral_code, qualified_referrals, has_card, avatar_url')
         .eq('id', user.id)
         .single();
 
-      if (profileError) {
-      console.error("Erreur Supabase lors du .select():", profileError);
-      throw profileError;
-      }
+      if (profileError) throw profileError;
 
-      // Récupère le nombre total de filleuls
       const { count: referralsCount } = await supabase
         .from('users')
         .select('*', { count: 'exact' })
@@ -93,7 +85,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  // Mise à jour du profil
   updateProfile: async (updates) => {
     const { user } = get();
     if (!user) return;
@@ -101,7 +92,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      // Met à jour la table 'users' dans Supabase
       const { error } = await supabase
         .from('users')
         .update(updates)
@@ -109,7 +99,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       if (error) throw error;
 
-      // Met à jour le store local
       set((state) => ({
         profile: state.profile ? { ...state.profile, ...updates } : null,
         isLoading: false
@@ -121,13 +110,44 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       console.error('Error updating profile:', error);
     }
+  },
+
+  uploadAvatar: async (file: File) => {
+    const { user } = get();
+    if (!user) throw new Error('User not authenticated');
+
+    try {
+      set({ isLoading: true });
+
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      await get().updateProfile({ avatar_url: publicUrl });
+
+      set({ isLoading: false });
+      return publicUrl;
+    } catch (error) {
+      set({
+        error: "Erreur lors de l'upload de l'avatar",
+        isLoading: false
+      });
+      throw error;
+    }
   }
 }));
 
-// Fonction pour initialiser l'état d'authentification au chargement de l'app
 export const initializeAuth = async () => {
   const { data: { session }, error } = await supabase.auth.getSession();
-  console.log('Session actuelle:', session);
   const { setUser, loadProfile } = useAuthStore.getState();
 
   if (error) {
@@ -140,7 +160,6 @@ export const initializeAuth = async () => {
     await loadProfile();
   }
 
-  // Écoute les changements d'authentification
   supabase.auth.onAuthStateChange(async (_, session) => {
     setUser(session?.user ?? null);
     if (session?.user) {
